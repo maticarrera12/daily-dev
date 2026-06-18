@@ -33,6 +33,7 @@ export class FakeHabitTrackerApp implements HabitTrackerApp {
   reorderCalls: number[][] = [];
 
   failNextLoad = false;
+  failNextLoadCalendar = false;
   failNextToggle = false;
   failNextCreate = false;
   failNextReorder = false;
@@ -50,6 +51,10 @@ export class FakeHabitTrackerApp implements HabitTrackerApp {
 
   async loadCalendar(range: LoadCalendarRange): Promise<LoadCalendarResult> {
     this.loadCalendarCalls.push({ from: range.from, to: range.to });
+    if (this.failNextLoadCalendar) {
+      this.failNextLoadCalendar = false;
+      throw new Error("loadCalendar failed");
+    }
     const days = new Map<LocalDate, CalendarDayResult>();
     for (const date of range.allDatesInOrder) {
       days.set(

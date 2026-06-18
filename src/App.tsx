@@ -3,21 +3,31 @@ import "./App.css";
 import { createHabitTrackerApp } from "./infrastructure/composition/createHabitTrackerApp";
 import type { HabitTrackerApp } from "./infrastructure/composition/createHabitTrackerApp";
 import { createHabitStore } from "./state/habitStore";
+import { createCalendarStore } from "./state/calendarStore";
 import { TodayView } from "./ui/views/TodayView";
+import { CalendarView } from "./ui/views/CalendarView";
+import { ViewSwitcher } from "./ui/atoms/ViewSwitcher";
+import type { ActiveView } from "./ui/atoms/ViewSwitcher";
 
 interface AppRuntime {
   app: HabitTrackerApp;
   useHabitStore: ReturnType<typeof createHabitStore>;
+  useCalendarStore: ReturnType<typeof createCalendarStore>;
 }
 
 function App() {
   const [runtime, setRuntime] = useState<AppRuntime | null>(null);
+  const [activeView, setActiveView] = useState<ActiveView>("today");
 
   useEffect(() => {
     let isMounted = true;
     createHabitTrackerApp().then((app) => {
       if (!isMounted) return;
-      setRuntime({ app, useHabitStore: createHabitStore(app) });
+      setRuntime({
+        app,
+        useHabitStore: createHabitStore(app),
+        useCalendarStore: createCalendarStore(app),
+      });
     });
     return () => {
       isMounted = false;
@@ -32,7 +42,30 @@ function App() {
     );
   }
 
-  return <TodayView useHabitStore={runtime.useHabitStore} app={runtime.app} />;
+  return (
+    <>
+      <div className="flex justify-center bg-surface pt-6">
+        <ViewSwitcher active={activeView} onChange={setActiveView} />
+      </div>
+      {activeView === "today" && (
+        <TodayView useHabitStore={runtime.useHabitStore} app={runtime.app} />
+      )}
+      {activeView === "week" && (
+        <CalendarView
+          useCalendarStore={runtime.useCalendarStore}
+          app={runtime.app}
+          mode="week"
+        />
+      )}
+      {activeView === "month" && (
+        <CalendarView
+          useCalendarStore={runtime.useCalendarStore}
+          app={runtime.app}
+          mode="month"
+        />
+      )}
+    </>
+  );
 }
 
 export default App;
