@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(70% 0.19 41); /* friendly orange */
+  --color-primary-hover: oklch(64% 0.2 41);
+  --color-surface: oklch(99% 0.005 95); /* light, warm white */
+  --color-surface-card: oklch(100% 0 0);
+  --font-display: "Quicksand", "Nunito", sans-serif; /* rounded friendly */
+  --radius-card: 1.25rem;
+  --spacing-card-gap: 1.5rem;
+}
+
+:root {
+  font-family: var(--font-display);
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-surface);
+  color: oklch(25% 0.01 95);
+}
