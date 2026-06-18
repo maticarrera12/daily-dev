@@ -1,13 +1,38 @@
+import { useEffect, useState } from "react";
 import "./App.css";
+import { createHabitTrackerApp } from "./infrastructure/composition/createHabitTrackerApp";
+import type { HabitTrackerApp } from "./infrastructure/composition/createHabitTrackerApp";
+import { createHabitStore } from "./state/habitStore";
+import { TodayView } from "./ui/views/TodayView";
 
-// Placeholder root component for Phase 1 (scaffold + DB + migrations).
-// TodayView and the rest of the UI tree are wired in Phase 4.
+interface AppRuntime {
+  app: HabitTrackerApp;
+  useHabitStore: ReturnType<typeof createHabitStore>;
+}
+
 function App() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-surface">
-      <h1 className="font-display text-2xl text-primary">daily-dev</h1>
-    </main>
-  );
+  const [runtime, setRuntime] = useState<AppRuntime | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    createHabitTrackerApp().then((app) => {
+      if (!isMounted) return;
+      setRuntime({ app, useHabitStore: createHabitStore(app) });
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!runtime) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-surface">
+        <p className="font-display text-lg text-slate-500">Loading…</p>
+      </main>
+    );
+  }
+
+  return <TodayView useHabitStore={runtime.useHabitStore} app={runtime.app} />;
 }
 
 export default App;
