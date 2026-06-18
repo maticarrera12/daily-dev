@@ -8,7 +8,6 @@ import { TodayView } from "./ui/views/TodayView";
 import { CalendarView } from "./ui/views/CalendarView";
 import { ViewSwitcher } from "./ui/atoms/ViewSwitcher";
 import type { ActiveView } from "./ui/atoms/ViewSwitcher";
-
 interface AppRuntime {
   app: HabitTrackerApp;
   useHabitStore: ReturnType<typeof createHabitStore>;

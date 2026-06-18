@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 import { computePostItTransform } from "./scatter";
 
 const MAX_ROTATION_DEG = 8;
-const MIN_PCT = 0;
-const MAX_PCT = 100;
+const MIN_PCT = 10;
+const MAX_PCT = 90;
 
 describe("computePostItTransform", () => {
   test("scenario 12: identical (habitId, date, indexInDay, totalInDay) inputs produce deep-equal output", () => {

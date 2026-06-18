@@ -1,6 +1,7 @@
 import type { CalendarDayResult } from "../../application/use-cases/loadCalendar";
 import type { MonthGridDay } from "../../domain/calendar/grid";
 import type { LocalDate } from "../../domain/streak/types";
+import { CALENDAR_GRID_CLASS } from "../calendarLayout";
 import { DayCell } from "../molecules/DayCell";
 import { WeekdayHeader } from "../atoms/WeekdayHeader";
 
@@ -12,9 +13,9 @@ export interface MonthViewProps {
 
 export function MonthView({ grid, days, toImageUrl }: MonthViewProps) {
   return (
-    <div>
+    <>
       <WeekdayHeader />
-      <div className="grid grid-cols-7 gap-2">
+      <div className={CALENDAR_GRID_CLASS}>
         {grid.map((cell) => {
           const day = days.get(cell.date);
           return (
@@ -30,6 +31,6 @@ export function MonthView({ grid, days, toImageUrl }: MonthViewProps) {
           );
         })}
       </div>
-    </div>
+    </>
   );
 }

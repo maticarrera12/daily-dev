@@ -5,6 +5,10 @@ import type { CalendarMode, CalendarStore, createCalendarStore } from "../../sta
 import { WeekView } from "../organisms/WeekView";
 import { MonthView } from "../organisms/MonthView";
 import { weekDays, monthGrid } from "../../domain/calendar/grid";
+import {
+  CALENDAR_BLOCK_CLASS,
+  CALENDAR_SCROLL_CLASS,
+} from "../calendarLayout";
 
 export interface CalendarViewProps {
   useCalendarStore: ReturnType<typeof createCalendarStore>;
@@ -33,39 +37,43 @@ export function CalendarView({ useCalendarStore, app, mode }: CalendarViewProps)
   const toImageUrl = (path: string) => app.toRenderableImageUrl(path);
 
   return (
-    <section className="mx-auto mt-10 max-w-5xl">
-      <header className="mb-4 flex items-center justify-between">
-        <button
-          type="button"
-          aria-label="Previous"
-          onClick={() => goToPrevious()}
-          className="rounded-full px-3 py-1.5 text-sm font-semibold text-slate-500 hover:bg-surface-card"
-        >
-          ← Previous
-        </button>
-        <button
-          type="button"
-          aria-label="Next"
-          onClick={() => goToNext()}
-          className="rounded-full px-3 py-1.5 text-sm font-semibold text-slate-500 hover:bg-surface-card"
-        >
-          Next →
-        </button>
-      </header>
+    <section className="mx-auto mt-10 w-full">
+      <div className={CALENDAR_SCROLL_CLASS}>
+        <div className={CALENDAR_BLOCK_CLASS}>
+          <header className="mb-4 flex items-center justify-between">
+            <button
+              type="button"
+              aria-label="Previous"
+              onClick={() => goToPrevious()}
+              className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-slate-500 hover:bg-surface-card"
+            >
+              ← Previous
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              onClick={() => goToNext()}
+              className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-slate-500 hover:bg-surface-card"
+            >
+              Next →
+            </button>
+          </header>
 
-      {mode === "week" ? (
-        <WeekView
-          weekDates={anchorDate ? weekDays(anchorDate) : []}
-          days={days}
-          toImageUrl={toImageUrl}
-        />
-      ) : (
-        <MonthView
-          grid={anchorDate ? monthGrid(anchorDate) : []}
-          days={days}
-          toImageUrl={toImageUrl}
-        />
-      )}
+          {mode === "week" ? (
+            <WeekView
+              weekDates={anchorDate ? weekDays(anchorDate) : []}
+              days={days}
+              toImageUrl={toImageUrl}
+            />
+          ) : (
+            <MonthView
+              grid={anchorDate ? monthGrid(anchorDate) : []}
+              days={days}
+              toImageUrl={toImageUrl}
+            />
+          )}
+        </div>
+      </div>
     </section>
   );
 }

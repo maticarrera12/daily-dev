@@ -1,5 +1,6 @@
 import type { CalendarDayResult } from "../../application/use-cases/loadCalendar";
 import type { LocalDate } from "../../domain/streak/types";
+import { CALENDAR_GRID_CLASS } from "../calendarLayout";
 import { DayCell } from "../molecules/DayCell";
 import { WeekdayHeader } from "../atoms/WeekdayHeader";
 
@@ -11,9 +12,9 @@ export interface WeekViewProps {
 
 export function WeekView({ weekDates, days, toImageUrl }: WeekViewProps) {
   return (
-    <div>
+    <>
       <WeekdayHeader />
-      <div className="grid grid-cols-7 gap-2">
+      <div className={CALENDAR_GRID_CLASS}>
         {weekDates.map((date) => {
           const day = days.get(date);
           return (
@@ -29,6 +30,6 @@ export function WeekView({ weekDates, days, toImageUrl }: WeekViewProps) {
           );
         })}
       </div>
-    </div>
+    </>
   );
 }

@@ -32,27 +32,31 @@ export function DayCell({
     <div
       data-testid="day-cell"
       className={cn(
-        "relative flex min-h-32 flex-col gap-1 overflow-hidden rounded-2xl border border-slate-100 bg-surface-card p-2",
+        "relative flex h-32 w-full shrink-0 flex-col gap-1 overflow-hidden rounded-2xl border border-slate-100 bg-surface-card p-2",
         !inMonth && "opacity-40",
       )}
     >
-      <span className="text-xs font-semibold text-slate-500">{dayNumber}</span>
+      <span className="relative z-10 shrink-0 text-xs font-semibold text-slate-500">
+        {dayNumber}
+      </span>
 
       <div
         data-testid="mascot-scatter-area"
-        className="relative min-h-24 flex-1"
+        className="relative min-h-0 flex-1"
       >
-        {mascots.map((mascot, index) => (
-          <MascotPostIt
-            key={mascot.id}
-            imageUrl={toImageUrl(mascot.imagePath)}
-            name={mascot.name}
-            habitId={mascot.id}
-            date={date}
-            indexInDay={index}
-            totalInDay={mascots.length}
-          />
-        ))}
+        <div className="absolute inset-0">
+          {mascots.map((mascot, index) => (
+            <MascotPostIt
+              key={mascot.id}
+              imageUrl={toImageUrl(mascot.imagePath)}
+              name={mascot.name}
+              habitId={mascot.id}
+              date={date}
+              indexInDay={index}
+              totalInDay={mascots.length}
+            />
+          ))}
+        </div>
       </div>
 
       {overflowCount > 0 && (

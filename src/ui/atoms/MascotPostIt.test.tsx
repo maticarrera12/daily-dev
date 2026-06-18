@@ -43,11 +43,11 @@ describe("MascotPostIt", () => {
       left: `${transform.leftPct}%`,
     });
     expect(wrapper?.getAttribute("style")).toContain(
-      `rotate(${transform.rotationDeg}deg)`,
+      `translate(-50%, -50%) rotate(${transform.rotationDeg}deg)`,
     );
   });
 
-  test("positions itself absolutely via top/left percentages instead of translate-on-self", () => {
+  test("centers on top/left percentages via translate(-50%, -50%)", () => {
     render(
       <MascotPostIt
         imageUrl="asset://managed/1.png"
@@ -66,7 +66,7 @@ describe("MascotPostIt", () => {
 
     expect(style).toContain(`top: ${transform.topPct}%`);
     expect(style).toContain(`left: ${transform.leftPct}%`);
-    expect(style).not.toContain("translate(");
+    expect(style).toContain("translate(-50%, -50%)");
   });
 
   test("exposes no toggle/edit controls (read-only by construction)", () => {

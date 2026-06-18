@@ -1,3 +1,5 @@
+import { CALENDAR_GRID_CLASS } from "../calendarLayout";
+
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /**
@@ -9,7 +11,7 @@ export function WeekdayHeader() {
   return (
     <div
       data-testid="weekday-header"
-      className="grid grid-cols-7 gap-2 px-2 pb-1"
+      className={`${CALENDAR_GRID_CLASS} pb-1`}
     >
       {WEEKDAY_LABELS.map((label) => (
         <span

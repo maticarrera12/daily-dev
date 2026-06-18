@@ -88,7 +88,7 @@ describe("DayCell", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
-  test("the mascot scatter area is positioned relatively with a stable non-zero min-height so cell-relative percentages resolve correctly", () => {
+  test("the mascot scatter area fills the cell below the day number so percentages resolve against a stable box", () => {
     render(
       <DayCell
         date="2026-06-17"
@@ -101,13 +101,10 @@ describe("DayCell", () => {
     );
 
     const scatterArea = screen.getByTestId("mascot-scatter-area");
-    expect(scatterArea).toHaveClass("relative");
-    expect(scatterArea.className).toMatch(/min-h-/);
+    expect(scatterArea).toHaveClass("relative", "flex-1", "min-h-0");
+    expect(scatterArea.firstElementChild).toHaveClass("absolute", "inset-0");
   });
 
-  // NOTE: jsdom cannot validate actual visual layout/overlap. This asserts
-  // the intended Tailwind sizing classes only — manual visual verification
-  // is required to confirm bigger, more-distributed mascots look right.
   test("the scatter area and cell grow tall enough to host bigger (44px), more-distributed mascots", () => {
     render(
       <DayCell
@@ -122,8 +119,8 @@ describe("DayCell", () => {
 
     const dayCell = screen.getByTestId("day-cell");
     const scatterArea = screen.getByTestId("mascot-scatter-area");
-    expect(dayCell.className).toMatch(/min-h-32/);
-    expect(scatterArea.className).toMatch(/min-h-24/);
+    expect(dayCell.className).toMatch(/h-32/);
+    expect(scatterArea.className).toMatch(/flex-1/);
   });
 
   test("passes the total mascot count in the day to each MascotPostIt so the scatter distribution scales", () => {

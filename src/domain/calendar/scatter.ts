@@ -2,24 +2,21 @@ import type { LocalDate } from "../streak/types";
 
 export interface PostItTransform {
   rotationDeg: number; // bounded, [-8, 8]
-  topPct: number; // cell-relative absolute position, clamped [MIN_PCT, MAX_PCT]
-  leftPct: number; // cell-relative absolute position, clamped [MIN_PCT, MAX_PCT]
+  topPct: number; // cell-relative center point, clamped [MIN_PCT, MAX_PCT]
+  leftPct: number; // cell-relative center point, clamped [MIN_PCT, MAX_PCT]
   zIndex: number; // driven by indexInDay only
 }
 
 const MAX_ROTATION_DEG = 8;
 
 /**
- * Safe bounds so the 44px post-it (positioned by its top-left corner) stays
- * clear of the cell edges across typical day-cell widths. This is a
- * percentage-based approximation — it cannot know the exact pixel width of
- * the cell, so `DayCell`'s scatter area additionally applies
- * `overflow-hidden` clipped to the card's rounded corners as the hard
- * guarantee against spill, even if a post-it lands close to an edge on an
- * unusually narrow viewport.
+ * Safe bounds for the mascot *center* (MascotPostIt applies
+ * translate(-50%, -50%)). Wider than the old top-left anchor range so grid
+ * slots can use the full cell. `DayCell` overflow-hidden clips edge spill on
+ * narrow viewports.
  */
-const MIN_PCT = 15;
-const MAX_PCT = 80;
+const MIN_PCT = 10;
+const MAX_PCT = 90;
 
 /** FNV-1a (32-bit, no crypto, pure integer ops). */
 function fnv1a(input: string): number {

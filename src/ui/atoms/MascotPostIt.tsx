@@ -38,14 +38,14 @@ export function MascotPostIt({
       style={{
         top: `${topPct}%`,
         left: `${leftPct}%`,
-        transform: `rotate(${rotationDeg}deg)`,
+        transform: `translate(-50%, -50%) rotate(${rotationDeg}deg)`,
         zIndex,
       }}
     >
       <img
         src={imageUrl}
         alt={name}
-        className="h-full w-full rounded-full object-cover shadow-sm ring-2 ring-surface"
+        className="h-full w-full rounded-full object-cover shadow-sm"
       />
     </div>
   );
