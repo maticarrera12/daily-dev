@@ -81,8 +81,8 @@ describe("loadCalendar", () => {
     ]);
   });
 
-  test("scenario 20: 8 completions on the same day return exactly 6 mascots + overflowCount 2, deterministic by ascending habitId", async () => {
-    for (let habitId = 1; habitId <= 8; habitId++) {
+  test("scenario 20: 32 completions on the same day return exactly 30 mascots + overflowCount 2, deterministic by ascending habitId", async () => {
+    for (let habitId = 1; habitId <= 32; habitId++) {
       recordRepo.seedHabitMeta(habitId, `Habit ${habitId}`, `/managed/${habitId}.png`);
       recordRepo.seed(habitId, "2026-06-17", true);
     }
@@ -93,13 +93,15 @@ describe("loadCalendar", () => {
     );
 
     const day = result.days.get("2026-06-17");
-    expect(day?.mascots).toHaveLength(6);
-    expect(day?.mascots.map((m) => m.id)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(day?.mascots).toHaveLength(30);
+    expect(day?.mascots.map((m) => m.id)).toEqual(
+      Array.from({ length: 30 }, (_, i) => i + 1),
+    );
     expect(day?.overflowCount).toBe(2);
   });
 
-  test("scenario 21: exactly 6 completions on a day return all 6 mascots with overflowCount 0", async () => {
-    for (let habitId = 1; habitId <= 6; habitId++) {
+  test("scenario 21: exactly 30 completions on a day return all 30 mascots with overflowCount 0", async () => {
+    for (let habitId = 1; habitId <= 30; habitId++) {
       recordRepo.seedHabitMeta(habitId, `Habit ${habitId}`, `/managed/${habitId}.png`);
       recordRepo.seed(habitId, "2026-06-17", true);
     }
@@ -110,7 +112,23 @@ describe("loadCalendar", () => {
     );
 
     const day = result.days.get("2026-06-17");
-    expect(day?.mascots).toHaveLength(6);
+    expect(day?.mascots).toHaveLength(30);
+    expect(day?.overflowCount).toBe(0);
+  });
+
+  test("scenario 21b: a typical small count (4 completions) shows all of them with no overflow", async () => {
+    for (let habitId = 1; habitId <= 4; habitId++) {
+      recordRepo.seedHabitMeta(habitId, `Habit ${habitId}`, `/managed/${habitId}.png`);
+      recordRepo.seed(habitId, "2026-06-17", true);
+    }
+
+    const result = await loadCalendar(
+      { dailyRecordRepository: recordRepo },
+      weekRange("2026-06-15", "2026-06-21"),
+    );
+
+    const day = result.days.get("2026-06-17");
+    expect(day?.mascots).toHaveLength(4);
     expect(day?.overflowCount).toBe(0);
   });
 

@@ -2,39 +2,20 @@ import type { LocalDate } from "../streak/types";
 
 export interface PostItTransform {
   rotationDeg: number; // bounded, [-8, 8]
-  topPct: number; // cell-relative absolute position, clamped [6, 94]
-  leftPct: number; // cell-relative absolute position, clamped [6, 94]
+  topPct: number; // cell-relative absolute position, clamped [MIN_PCT, MAX_PCT]
+  leftPct: number; // cell-relative absolute position, clamped [MIN_PCT, MAX_PCT]
   zIndex: number; // driven by indexInDay only
 }
 
 const MAX_ROTATION_DEG = 8;
 
-/** Safe bounds so the 32px post-it never overflows the cell edges. */
-const MIN_PCT = 6;
-const MAX_PCT = 94;
-
 /**
- * Fixed set of 6 irregularly-spread anchor positions covering the day cell
- * (NOT a neat 2x3 grid). Each `indexInDay` maps to a distinct anchor, so
- * positions never collide by construction regardless of hash. Geometry is
- * fixed at the max cap (not scaled to the active count) so an already
- * rendered post-it keeps its slot when siblings are added/removed (R2.2).
+ * Safe bounds so the 44px post-it never overflows the cell edges (a 44px
+ * box centered at the edge of a typical day-cell footprint needs roughly
+ * this much margin at both ends).
  */
-const ANCHORS: ReadonlyArray<{ top: number; left: number }> = [
-  { top: 18, left: 22 },
-  { top: 30, left: 70 },
-  { top: 55, left: 12 },
-  { top: 68, left: 50 },
-  { top: 40, left: 88 },
-  { top: 80, left: 78 },
-];
-
-/** Local jitter radius (in pct points) applied around each anchor. */
-const JITTER_RADIUS_PCT = 10;
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
+const MIN_PCT = 10;
+const MAX_PCT = 90;
 
 /** FNV-1a (32-bit, no crypto, pure integer ops). */
 function fnv1a(input: string): number {
@@ -46,33 +27,63 @@ function fnv1a(input: string): number {
   return hash >>> 0; // unsigned 32-bit
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
 /**
  * Deterministic pure transform seeded by `(habitId, date)` for rotation and
- * jitter, and by `indexInDay` for anchor slot selection. `indexInDay` now
- * drives POSITION (not just zIndex): each index maps to a distinct fixed
- * anchor spread irregularly across the cell, so siblings never stack.
- * Adding/removing other mascots on the same day never reshuffles an
- * already-rendered post-it's anchor (stable across re-renders, R2.2).
+ * jitter, and by `(indexInDay, totalInDay)` for grid-cell placement.
+ *
+ * Distribution scales to the day's count instead of a fixed 6-anchor table:
+ * the cell is divided into a `cols x rows` grid sized to `totalInDay`
+ * (`cols = ceil(sqrt(totalInDay))`, `rows = ceil(totalInDay / cols)`), each
+ * index maps to its own grid cell by `(col, row)`, and a hash-seeded jitter
+ * is added within that cell so the result looks organic rather than a neat
+ * grid. This guarantees pairwise-distinct base cells for every index in the
+ * same day (no stacking) and spreads mascots across the WHOLE cell instead
+ * of clustering near a handful of fixed points.
  */
 export function computePostItTransform(
   habitId: number,
   date: LocalDate,
   indexInDay: number,
+  totalInDay: number,
 ): PostItTransform {
   const hash = fnv1a(`${habitId}:${date}`);
 
   const rotationDeg =
     ((hash & 0xff) / 255) * 2 * MAX_ROTATION_DEG - MAX_ROTATION_DEG;
+
+  const count = Math.max(1, totalInDay);
+  const cols = Math.max(1, Math.ceil(Math.sqrt(count)));
+  const rows = Math.max(1, Math.ceil(count / cols));
+
+  const safeIndex = ((indexInDay % count) + count) % count;
+  const col = safeIndex % cols;
+  const row = Math.floor(safeIndex / cols);
+
+  const cellWidthPct = 100 / cols;
+  const cellHeightPct = 100 / rows;
+
+  const cellCenterLeft = col * cellWidthPct + cellWidthPct / 2;
+  const cellCenterTop = row * cellHeightPct + cellHeightPct / 2;
+
+  // Jitter within the cell, seeded by hash + index so it's deterministic
+  // and varies per slot (not just per day). Bounded to a fraction of the
+  // cell size so items stay inside their own cell — "organic", not random.
+  const jitterSeed = fnv1a(`${habitId}:${date}:${indexInDay}`);
+  const jitterRangeTop = cellHeightPct * 0.3;
+  const jitterRangeLeft = cellWidthPct * 0.3;
+
   const jitterTop =
-    (((hash >>> 8) & 0xff) / 255) * 2 * JITTER_RADIUS_PCT - JITTER_RADIUS_PCT;
+    (((jitterSeed >>> 8) & 0xff) / 255) * 2 * jitterRangeTop - jitterRangeTop;
   const jitterLeft =
-    (((hash >>> 16) & 0xff) / 255) * 2 * JITTER_RADIUS_PCT -
-    JITTER_RADIUS_PCT;
+    (((jitterSeed >>> 16) & 0xff) / 255) * 2 * jitterRangeLeft -
+    jitterRangeLeft;
 
-  const anchor = ANCHORS[indexInDay % ANCHORS.length];
-
-  const topPct = clamp(anchor.top + jitterTop, MIN_PCT, MAX_PCT);
-  const leftPct = clamp(anchor.left + jitterLeft, MIN_PCT, MAX_PCT);
+  const topPct = clamp(cellCenterTop + jitterTop, MIN_PCT, MAX_PCT);
+  const leftPct = clamp(cellCenterLeft + jitterLeft, MIN_PCT, MAX_PCT);
 
   return {
     rotationDeg,

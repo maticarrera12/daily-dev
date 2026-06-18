@@ -14,8 +14,11 @@ export interface DayCellProps {
 
 /**
  * Read-only by construction — no onToggle/onEdit prop, mirrors MascotPostIt
- * (R5.5). Renders up to 6 mascots (loadCalendar already caps the array) plus
- * a "+k" overflow badge when overflowCount > 0.
+ * (R5.5). Renders up to CROWDING_CAP mascots (loadCalendar already caps the
+ * array, currently 30 — a rare safety net) plus a "+k" overflow badge when
+ * overflowCount > 0. Passes the day's total mascot count to each
+ * MascotPostIt so its scatter distribution scales (grid spreads across the
+ * whole cell instead of clustering at fixed anchors).
  */
 export function DayCell({
   date,
@@ -29,7 +32,7 @@ export function DayCell({
     <div
       data-testid="day-cell"
       className={cn(
-        "relative flex min-h-24 flex-col gap-1 rounded-2xl border border-slate-100 bg-surface-card p-2",
+        "relative flex min-h-32 flex-col gap-1 rounded-2xl border border-slate-100 bg-surface-card p-2",
         !inMonth && "opacity-40",
       )}
     >
@@ -37,7 +40,7 @@ export function DayCell({
 
       <div
         data-testid="mascot-scatter-area"
-        className="relative min-h-16 flex-1"
+        className="relative min-h-24 flex-1"
       >
         {mascots.map((mascot, index) => (
           <MascotPostIt
@@ -47,6 +50,7 @@ export function DayCell({
             habitId={mascot.id}
             date={date}
             indexInDay={index}
+            totalInDay={mascots.length}
           />
         ))}
       </div>

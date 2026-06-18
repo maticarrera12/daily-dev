@@ -7,6 +7,7 @@ export interface MascotPostItProps {
   habitId: number;
   date: LocalDate;
   indexInDay: number;
+  totalInDay: number;
 }
 
 /**
@@ -22,16 +23,18 @@ export function MascotPostIt({
   habitId,
   date,
   indexInDay,
+  totalInDay,
 }: MascotPostItProps) {
   const { rotationDeg, topPct, leftPct, zIndex } = computePostItTransform(
     habitId,
     date,
     indexInDay,
+    totalInDay,
   );
 
   return (
     <div
-      className="absolute h-8 w-8"
+      className="absolute h-11 w-11"
       style={{
         top: `${topPct}%`,
         left: `${leftPct}%`,

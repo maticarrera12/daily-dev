@@ -1,7 +1,12 @@
 import type { CompletedRecordWithHabit, LocalDate } from "../../domain/streak/types";
 import type { DailyRecordRepository } from "../ports/DailyRecordRepository";
 
-const CROWDING_CAP = 6;
+/**
+ * Safety-net cap, not a typical-day limit. Real households rarely exceed a
+ * handful of habits/day; this just bounds worst-case rendering cost while
+ * the scatter distribution (see scatter.ts) scales to show all of them.
+ */
+const CROWDING_CAP = 30;
 
 export interface LoadCalendarDeps {
   dailyRecordRepository: DailyRecordRepository;
@@ -15,7 +20,7 @@ export interface CalendarMascot {
 
 export interface CalendarDayResult {
   date: LocalDate;
-  mascots: CalendarMascot[]; // capped at CROWDING_CAP
+  mascots: CalendarMascot[]; // capped at CROWDING_CAP (safety net, rarely hit)
   overflowCount: number; // 0 when total <= CROWDING_CAP
 }
 

@@ -12,6 +12,7 @@ describe("MascotPostIt", () => {
         habitId={1}
         date="2026-06-17"
         indexInDay={0}
+        totalInDay={1}
       />,
     );
 
@@ -27,10 +28,11 @@ describe("MascotPostIt", () => {
         habitId={1}
         date="2026-06-17"
         indexInDay={0}
+        totalInDay={4}
       />,
     );
 
-    const transform = computePostItTransform(1, "2026-06-17", 0);
+    const transform = computePostItTransform(1, "2026-06-17", 0, 4);
     const img = screen.getByRole("img", { name: "Drink water" });
     const wrapper = img.closest("[style]");
 
@@ -53,10 +55,11 @@ describe("MascotPostIt", () => {
         habitId={1}
         date="2026-06-17"
         indexInDay={2}
+        totalInDay={4}
       />,
     );
 
-    const transform = computePostItTransform(1, "2026-06-17", 2);
+    const transform = computePostItTransform(1, "2026-06-17", 2, 4);
     const img = screen.getByRole("img", { name: "Drink water" });
     const wrapper = img.closest("[style]");
     const style = wrapper?.getAttribute("style") ?? "";
@@ -74,9 +77,27 @@ describe("MascotPostIt", () => {
         habitId={1}
         date="2026-06-17"
         indexInDay={0}
+        totalInDay={1}
       />,
     );
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  test("renders the mascot image at the bigger 44px (w-11 h-11) size", () => {
+    render(
+      <MascotPostIt
+        imageUrl="asset://managed/1.png"
+        name="Drink water"
+        habitId={1}
+        date="2026-06-17"
+        indexInDay={0}
+        totalInDay={1}
+      />,
+    );
+
+    const img = screen.getByRole("img", { name: "Drink water" });
+    const wrapper = img.closest("[style]");
+    expect(wrapper).toHaveClass("h-11", "w-11");
   });
 });
