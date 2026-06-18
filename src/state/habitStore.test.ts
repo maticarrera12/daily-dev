@@ -134,6 +134,33 @@ describe("habitStore", () => {
     expect(useHabitStore.getState().habits).toHaveLength(0);
   });
 
+  test("reorderHabits() updates order optimistically and persists via the app", async () => {
+    app.habits = [
+      { id: 1, name: "A", imagePath: "/managed/1.png", currentStreak: 0, completedToday: false },
+      { id: 2, name: "B", imagePath: "/managed/2.png", currentStreak: 0, completedToday: false },
+    ];
+    await useHabitStore.getState().init();
+
+    await useHabitStore.getState().reorderHabits([2, 1]);
+
+    expect(useHabitStore.getState().habits.map((habit) => habit.id)).toEqual([2, 1]);
+    expect(app.reorderCalls).toEqual([[2, 1]]);
+  });
+
+  test("reorderHabits() rolls back and sets an error when persistence fails", async () => {
+    app.habits = [
+      { id: 1, name: "A", imagePath: "/managed/1.png", currentStreak: 0, completedToday: false },
+      { id: 2, name: "B", imagePath: "/managed/2.png", currentStreak: 0, completedToday: false },
+    ];
+    await useHabitStore.getState().init();
+    app.failNextReorder = true;
+
+    await useHabitStore.getState().reorderHabits([2, 1]);
+
+    expect(useHabitStore.getState().habits.map((habit) => habit.id)).toEqual([1, 2]);
+    expect(useHabitStore.getState().error).not.toBeNull();
+  });
+
   test("clearError() resets the error to null", async () => {
     app.failNextLoad = true;
     await useHabitStore.getState().init();

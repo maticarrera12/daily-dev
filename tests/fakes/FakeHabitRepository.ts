@@ -10,6 +10,10 @@ export class FakeHabitRepository implements HabitRepository {
   private nextId = 1;
 
   async create(habit: NewHabit): Promise<Habit> {
+    const sortOrder =
+      this.habits.length === 0
+        ? 0
+        : Math.max(...this.habits.map((h) => h.sortOrder)) + 1;
     const created: Habit = {
       id: this.nextId++,
       name: habit.name,
@@ -17,6 +21,7 @@ export class FakeHabitRepository implements HabitRepository {
       createdAt: habit.createdAt,
       active: true,
       currentStreak: 0,
+      sortOrder,
     };
     this.habits.push(created);
     return created;
@@ -36,7 +41,16 @@ export class FakeHabitRepository implements HabitRepository {
   }
 
   async listActive(): Promise<Habit[]> {
-    return this.habits.filter((h) => h.active);
+    return this.habits
+      .filter((h) => h.active)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
+  }
+
+  async updateOrder(orderedIds: number[]): Promise<void> {
+    orderedIds.forEach((id, index) => {
+      const habit = this.habits.find((h) => h.id === id);
+      if (habit) habit.sortOrder = index;
+    });
   }
 
   async updateStreakCache(id: number, streak: number): Promise<void> {

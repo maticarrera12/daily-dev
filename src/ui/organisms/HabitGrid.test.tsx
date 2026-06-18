@@ -15,6 +15,7 @@ describe("HabitGrid", () => {
         toImageUrl={(path) => `asset://${path}`}
         onToggle={() => {}}
         onEdit={() => {}}
+        onReorder={() => {}}
       />,
     );
 
@@ -30,6 +31,7 @@ describe("HabitGrid", () => {
         toImageUrl={(path) => `asset://${path}`}
         onToggle={onToggle}
         onEdit={() => {}}
+        onReorder={() => {}}
       />,
     );
 
@@ -46,6 +48,7 @@ describe("HabitGrid", () => {
         toImageUrl={(path) => `asset://${path}`}
         onToggle={() => {}}
         onEdit={onEdit}
+        onReorder={() => {}}
       />,
     );
 

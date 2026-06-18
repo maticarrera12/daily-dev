@@ -19,6 +19,7 @@ export function TodayView({ useHabitStore, app }: TodayViewProps) {
   const createHabit = useHabitStore((state: HabitStore) => state.createHabit);
   const editHabit = useHabitStore((state: HabitStore) => state.editHabit);
   const deleteHabit = useHabitStore((state: HabitStore) => state.deleteHabit);
+  const reorderHabits = useHabitStore((state: HabitStore) => state.reorderHabits);
   const clearError = useHabitStore((state: HabitStore) => state.clearError);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -76,6 +77,9 @@ export function TodayView({ useHabitStore, app }: TodayViewProps) {
             toImageUrl={(path) => app.toRenderableImageUrl(path)}
             onToggle={toggle}
             onEdit={setEditingHabitId}
+            onReorder={(nextHabits) =>
+              reorderHabits(nextHabits.map((habit) => habit.id))
+            }
           />
         )}
       </section>

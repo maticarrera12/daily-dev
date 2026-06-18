@@ -21,10 +21,15 @@ export class SqliteHabitRepository implements HabitRepository {
   constructor(private readonly db: Database) {}
 
   async create(habit: NewHabit): Promise<Habit> {
+    const maxSortRows = await this.db.select<Array<{ max_sort: number | null }>>(
+      `SELECT MAX(sort_order) AS max_sort FROM habits`,
+    );
+    const sortOrder = (maxSortRows[0]?.max_sort ?? -1) + 1;
+
     const result = await this.db.execute(
-      `INSERT INTO habits (name, image_path, created_at, active, current_streak)
-       VALUES ($1, $2, $3, 1, 0)`,
-      [habit.name, habit.imagePath, habit.createdAt],
+      `INSERT INTO habits (name, image_path, created_at, active, current_streak, sort_order)
+       VALUES ($1, $2, $3, 1, 0, $4)`,
+      [habit.name, habit.imagePath, habit.createdAt, sortOrder],
     );
 
     const id = result.lastInsertId;
@@ -39,6 +44,7 @@ export class SqliteHabitRepository implements HabitRepository {
       createdAt: habit.createdAt,
       active: true,
       currentStreak: 0,
+      sortOrder,
     };
   }
 
@@ -71,10 +77,19 @@ export class SqliteHabitRepository implements HabitRepository {
 
   async listActive(): Promise<Habit[]> {
     const rows = await this.db.select<HabitRow[]>(
-      `SELECT id, name, image_path, created_at, active, current_streak
-       FROM habits WHERE active = 1 ORDER BY id ASC`,
+      `SELECT id, name, image_path, created_at, active, current_streak, sort_order
+       FROM habits WHERE active = 1 ORDER BY sort_order ASC, id ASC`,
     );
     return rows.map(habitRowToHabit);
+  }
+
+  async updateOrder(orderedIds: number[]): Promise<void> {
+    for (let index = 0; index < orderedIds.length; index++) {
+      await this.db.execute(
+        `UPDATE habits SET sort_order = $1 WHERE id = $2`,
+        [index, orderedIds[index]],
+      );
+    }
   }
 
   async updateStreakCache(id: number, streak: number): Promise<void> {

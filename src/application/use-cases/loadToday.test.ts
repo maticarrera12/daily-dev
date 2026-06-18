@@ -28,6 +28,7 @@ describe("loadToday", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 5, // stale cache, must be forced to 0
+      sortOrder: 0,
     });
     // Completed days that, evaluated in isolation, would hold via grace.
     recordRepo.seed(1, "2026-06-10", true);
@@ -57,6 +58,7 @@ describe("loadToday", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 3,
+      sortOrder: 0,
     });
     recordRepo.seed(1, "2026-06-15", true);
     recordRepo.seed(1, "2026-06-16", true);
@@ -84,6 +86,7 @@ describe("loadToday", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 999, // stale cache, must be replaced by a fresh computation
+      sortOrder: 0,
     });
     recordRepo.seed(1, "2026-06-15", true);
     recordRepo.seed(1, "2026-06-16", true);
@@ -112,6 +115,7 @@ describe("loadToday", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 0,
+      sortOrder: 0,
     });
     appStateRepo = new FakeAppStateRepository("2026-06-16");
     clock.set("2026-06-17");
@@ -134,6 +138,7 @@ describe("loadToday", () => {
       createdAt: "2026-06-17",
       active: true,
       currentStreak: 0,
+      sortOrder: 0,
     });
     appStateRepo = new FakeAppStateRepository(null);
     clock.set("2026-06-17");
@@ -165,6 +170,7 @@ describe("loadToday", () => {
       createdAt: "2025-12-01",
       active: true,
       currentStreak: 0,
+      sortOrder: 0,
     });
 
     const result = await loadToday({

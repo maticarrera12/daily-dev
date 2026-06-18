@@ -18,6 +18,7 @@ describe("deleteHabit", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 5,
+      sortOrder: 0,
     });
     recordRepo.seed(1, "2026-06-16", true);
   });

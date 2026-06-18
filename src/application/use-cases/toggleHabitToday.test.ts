@@ -21,6 +21,7 @@ describe("toggleHabitToday", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 0,
+      sortOrder: 0,
     });
   });
 

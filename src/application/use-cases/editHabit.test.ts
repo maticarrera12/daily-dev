@@ -18,6 +18,7 @@ describe("editHabit", () => {
       createdAt: "2026-06-01",
       active: true,
       currentStreak: 5,
+      sortOrder: 0,
     });
   });
 

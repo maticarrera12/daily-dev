@@ -18,10 +18,12 @@ export class FakeHabitTrackerApp implements HabitTrackerApp {
   createCalls: Array<{ name: string; imageSourcePath: string }> = [];
   editCalls: Array<{ habitId: number; patch: EditHabitPatch }> = [];
   deleteCalls: number[] = [];
+  reorderCalls: number[][] = [];
 
   failNextLoad = false;
   failNextToggle = false;
   failNextCreate = false;
+  failNextReorder = false;
 
   private nextId = 100;
 
@@ -73,6 +75,7 @@ export class FakeHabitTrackerApp implements HabitTrackerApp {
       createdAt: this.today,
       active: true,
       currentStreak: 0,
+      sortOrder: this.habits.length - 1,
     };
   }
 
@@ -85,6 +88,21 @@ export class FakeHabitTrackerApp implements HabitTrackerApp {
   async deleteHabit(habitId: number): Promise<void> {
     this.deleteCalls.push(habitId);
     this.habits = this.habits.filter((h) => h.id !== habitId);
+  }
+
+  async reorderHabits(orderedHabitIds: number[]): Promise<void> {
+    this.reorderCalls.push(orderedHabitIds);
+    if (this.failNextReorder) {
+      this.failNextReorder = false;
+      throw new Error("reorder failed");
+    }
+
+    const habitsById = new Map(this.habits.map((habit) => [habit.id, habit]));
+    this.habits = orderedHabitIds.map((id) => {
+      const habit = habitsById.get(id);
+      if (!habit) throw new Error(`habit ${id} not found`);
+      return habit;
+    });
   }
 
   async pickImage(): Promise<string | null> {

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { DraggableAttributes } from "@dnd-kit/core";
 import { HabitCard } from "./HabitCard";
 
 const baseHabit = {
@@ -82,5 +83,31 @@ describe("HabitCard", () => {
 
     expect(onEdit).toHaveBeenCalledWith(1);
     expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  test("renders a drag handle when dragHandleProps are provided", () => {
+    render(
+      <HabitCard
+        habit={baseHabit}
+        imageUrl="asset://managed/1.png"
+        onToggle={() => {}}
+        onEdit={() => {}}
+        dragHandleProps={{
+          attributes: {
+            role: "button",
+            tabIndex: 0,
+            "aria-disabled": false,
+            "aria-pressed": false,
+            "aria-roledescription": "sortable",
+            "aria-describedby": "dnd-kit-description",
+          } as DraggableAttributes,
+          listeners: undefined,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: /drag drink water to reorder/i }),
+    ).toBeInTheDocument();
   });
 });

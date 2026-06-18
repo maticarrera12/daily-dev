@@ -14,6 +14,7 @@ describe("habitRowToHabit", () => {
       created_at: "2026-06-17",
       active: 1,
       current_streak: 3,
+      sort_order: 0,
     };
 
     expect(habitRowToHabit(row)).toEqual({
@@ -23,6 +24,7 @@ describe("habitRowToHabit", () => {
       createdAt: "2026-06-17",
       active: true,
       currentStreak: 3,
+      sortOrder: 0,
     });
   });
 
@@ -34,6 +36,7 @@ describe("habitRowToHabit", () => {
       created_at: "2026-06-01",
       active: 0,
       current_streak: 0,
+      sort_order: 1,
     };
 
     expect(habitRowToHabit(row).active).toBe(false);

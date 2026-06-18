@@ -5,6 +5,7 @@ import { editHabit } from "../../application/use-cases/editHabit";
 import type { EditHabitPatch } from "../../application/use-cases/editHabit";
 import { loadToday } from "../../application/use-cases/loadToday";
 import type { LoadTodayResult } from "../../application/use-cases/loadToday";
+import { reorderHabits } from "../../application/use-cases/reorderHabits";
 import { toggleHabitToday } from "../../application/use-cases/toggleHabitToday";
 import type { ToggleHabitTodayResult } from "../../application/use-cases/toggleHabitToday";
 import type { Habit } from "../../application/ports/HabitRepository";
@@ -29,6 +30,7 @@ export interface HabitTrackerApp {
   createHabit(name: string, imageSourcePath: string): Promise<Habit>;
   editHabit(habitId: number, patch: EditHabitPatch): Promise<void>;
   deleteHabit(habitId: number): Promise<void>;
+  reorderHabits(orderedHabitIds: number[]): Promise<void>;
   pickImage(): Promise<string | null>;
   toRenderableImageUrl(storedImagePath: string): string;
 }
@@ -75,6 +77,9 @@ export async function createHabitTrackerApp(): Promise<HabitTrackerApp> {
       editHabit(habitId, patch, { habitRepository, imageStorage }),
 
     deleteHabit: (habitId: number) => deleteHabit(habitId, { habitRepository }),
+
+    reorderHabits: (orderedHabitIds: number[]) =>
+      reorderHabits(orderedHabitIds, { habitRepository }),
 
     pickImage,
 

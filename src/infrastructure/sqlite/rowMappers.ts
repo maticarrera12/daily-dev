@@ -9,6 +9,7 @@ export interface HabitRow {
   created_at: LocalDate;
   active: number; // SQLite has no boolean type; 0/1
   current_streak: number;
+  sort_order: number;
 }
 
 /** Raw shape returned by `db.select<DailyRecordRow[]>(...)` against `daily_records`. */
@@ -27,6 +28,7 @@ export function habitRowToHabit(row: HabitRow): Habit {
     createdAt: row.created_at,
     active: row.active === 1,
     currentStreak: row.current_streak,
+    sortOrder: row.sort_order,
   };
 }
 

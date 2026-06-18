@@ -7,6 +7,7 @@ export interface Habit {
   createdAt: LocalDate;
   active: boolean;
   currentStreak: number;
+  sortOrder: number;
 }
 
 export interface NewHabit {
@@ -26,4 +27,5 @@ export interface HabitRepository {
   softDelete(id: number): Promise<void>;
   listActive(): Promise<Habit[]>;
   updateStreakCache(id: number, streak: number): Promise<void>;
+  updateOrder(orderedIds: number[]): Promise<void>;
 }

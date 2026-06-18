@@ -12,11 +12,14 @@ export interface HabitStore {
   createHabit: (name: string, imageSourcePath: string) => Promise<void>;
   editHabit: (habitId: number, patch: EditHabitPatch) => Promise<void>;
   deleteHabit: (habitId: number) => Promise<void>;
+  reorderHabits: (orderedHabitIds: number[]) => Promise<void>;
   clearError: () => void;
 }
 
 function toErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Something went wrong";
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Something went wrong";
 }
 
 /**
@@ -100,6 +103,26 @@ export function createHabitStore(app: HabitTrackerApp) {
         set({ habits: result.habits });
       } catch (error) {
         set({ error: toErrorMessage(error) });
+      }
+    },
+
+    reorderHabits: async (orderedHabitIds: number[]) => {
+      const previousHabits = get().habits;
+      const habitsById = new Map(previousHabits.map((habit) => [habit.id, habit]));
+      const reordered = orderedHabitIds.map((id) => {
+        const habit = habitsById.get(id);
+        if (!habit) {
+          throw new Error(`Unknown habit id ${id}`);
+        }
+        return habit;
+      });
+
+      set({ habits: reordered, error: null });
+
+      try {
+        await app.reorderHabits(orderedHabitIds);
+      } catch (error) {
+        set({ habits: previousHabits, error: toErrorMessage(error) });
       }
     },
 
