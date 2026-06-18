@@ -45,9 +45,16 @@ export function scheduledDaysMissed(
   return count;
 }
 
-function nextDate(date: LocalDate): LocalDate {
+export function nextDate(date: LocalDate): LocalDate {
   const [year, month, day] = date.split("-").map(Number);
   const utcDate = new Date(Date.UTC(year, month - 1, day));
   utcDate.setUTCDate(utcDate.getUTCDate() + 1);
+  return utcDate.toISOString().slice(0, 10);
+}
+
+export function previousDate(date: LocalDate): LocalDate {
+  const [year, month, day] = date.split("-").map(Number);
+  const utcDate = new Date(Date.UTC(year, month - 1, day));
+  utcDate.setUTCDate(utcDate.getUTCDate() - 1);
   return utcDate.toISOString().slice(0, 10);
 }

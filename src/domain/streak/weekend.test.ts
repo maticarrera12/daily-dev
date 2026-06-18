@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { dayOfWeekUtc, isWeekendUtc, scheduledDaysMissed } from "./weekend";
+import {
+  dayOfWeekUtc,
+  isWeekendUtc,
+  nextDate,
+  previousDate,
+  scheduledDaysMissed,
+} from "./weekend";
 
 describe("dayOfWeekUtc", () => {
   test("returns 6 (Saturday) for a known Saturday", () => {
@@ -58,5 +64,33 @@ describe("scheduledDaysMissed", () => {
 
   test("lastOpenDate === null returns 0 regardless of today/skipWeekends", () => {
     expect(scheduledDaysMissed(null, "2026-06-16", true)).toBe(0);
+  });
+});
+
+describe("nextDate", () => {
+  test("returns the calendar day after the given date", () => {
+    expect(nextDate("2026-06-17")).toBe("2026-06-18");
+  });
+
+  test("rolls over a month boundary", () => {
+    expect(nextDate("2026-06-30")).toBe("2026-07-01");
+  });
+
+  test("rolls over a year boundary", () => {
+    expect(nextDate("2026-12-31")).toBe("2027-01-01");
+  });
+});
+
+describe("previousDate", () => {
+  test("returns the calendar day before the given date", () => {
+    expect(previousDate("2026-06-17")).toBe("2026-06-16");
+  });
+
+  test("rolls back over a month boundary", () => {
+    expect(previousDate("2026-07-01")).toBe("2026-06-30");
+  });
+
+  test("rolls back over a year boundary", () => {
+    expect(previousDate("2027-01-01")).toBe("2026-12-31");
   });
 });
